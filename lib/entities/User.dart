@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto/interfaces/Documentable.dart';
 
 class User implements Documentable {
-
   late String _name, _email, _birth, _uid;
+
+  String get name => _name;
 
   User(String name, String email, String birth, String id) {
     _name = name;

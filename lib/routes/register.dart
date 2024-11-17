@@ -5,7 +5,7 @@ import 'package:proyecto/providers/AuthProvider.dart';
 import 'package:proyecto/providers/DocumentProvider.dart';
 import 'package:proyecto/routes/load.dart';
 import 'package:proyecto/routes/login.dart';
-import 'package:proyecto/utils/PageTransition.dart';
+import 'package:proyecto/utils/page_transition.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -14,11 +14,13 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
-
 class _RegisterState extends State<Register>
     with SingleTickerProviderStateMixin, PageTransitionUtil {
   late AnimationController _controller;
-  late TextEditingController _nameController, _emailController, _pswController, _dateController;
+  late TextEditingController _nameController,
+      _emailController,
+      _pswController,
+      _dateController;
 
   final _form = GlobalKey<FormState>();
 
@@ -55,11 +57,10 @@ class _RegisterState extends State<Register>
 
   Future<void> _selectDate() async {
     DateTime? _picked = await showDatePicker(
-      context: context, 
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900), 
-      lastDate: DateTime(2100)
-    );
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2100));
 
     if (_picked != null) {
       setState(() {
@@ -71,95 +72,74 @@ class _RegisterState extends State<Register>
 
   Padding createField(TextEditingController c, String text) {
     return Padding(
-      padding:  const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-      child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-      
-        TextFormField(
-          controller: c,
-          cursorColor: Colors.black,
-          obscureText: (text == "Contraseña"),
-          enableSuggestions: !(text == "Contraseña"),
-          autocorrect: !(text == "Contraseña"),
-          validator: (text == "Correo" ? validateEmail : null),
-          onTap: (text == "Fecha de nacimiento" ? () => _selectDate() : null),
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          decoration: InputDecoration(
-            //errorText: ("Correo" == text) ? "Jm?" : null,
-            prefixIcon: ("Fecha de nacimiento" == text ? const Icon(Icons.calendar_today) : null),
-            focusColor: Colors.black,
-            labelText: text,
-            labelStyle: const TextStyle(
-              fontFamily: "DMSans",
-              fontSize: 16,
-              color: Colors.black
-            ),
-            border: const  OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.black,
-                width: 6.0
-              )
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.black,
-                width: 1.4
-              ) 
-            ),
-            
-          ),
-        )
-      ],
-    )
-    );
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              controller: c,
+              cursorColor: Colors.black,
+              obscureText: (text == "Contraseña"),
+              enableSuggestions: !(text == "Contraseña"),
+              autocorrect: !(text == "Contraseña"),
+              validator: (text == "Correo" ? validateEmail : null),
+              onTap:
+                  (text == "Fecha de nacimiento" ? () => _selectDate() : null),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              decoration: InputDecoration(
+                //errorText: ("Correo" == text) ? "Jm?" : null,
+                prefixIcon: ("Fecha de nacimiento" == text
+                    ? const Icon(Icons.calendar_today)
+                    : null),
+                focusColor: Colors.black,
+                labelText: text,
+                labelStyle: const TextStyle(
+                    fontFamily: "DMSans", fontSize: 16, color: Colors.black),
+                border: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 6.0)),
+                focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 1.4)),
+              ),
+            )
+          ],
+        ));
   }
 
   void _onRegister() async {
     if (_form.currentState!.validate()) {
-        String uid = await context.read<AuthProvider>().register(_emailController.text, _pswController.text);
-        if (uid == 'weak-password') {
-          _emailController.text = "";
-          _pswController.text = "";
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Al parecer tu contraseña es muy debil.")
-                )
-            );
-          return;
-        } else if (uid == 'email-already-in-use') {
-          _emailController.text = "";
-          _pswController.text = "";
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Sucedió algo con tu cuenta.")
-                )
-            );
-          return;
-        }
+      String uid = await context
+          .read<AuthProvider>()
+          .register(_emailController.text, _pswController.text);
+      if (uid == 'weak-password') {
+        _emailController.text = "";
+        _pswController.text = "";
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Al parecer tu contraseña es muy debil.")));
+        return;
+      } else if (uid == 'email-already-in-use') {
+        _emailController.text = "";
+        _pswController.text = "";
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Sucedió algo con tu cuenta.")));
+        return;
+      }
 
-        User nw = User(
-          _nameController.text, 
-          _emailController.text, 
-          _dateController.text, 
-          uid
-        );
+      User nw = User(_nameController.text, _emailController.text,
+          _dateController.text, uid);
 
-        context.read<DocumentProvider>().insertRecord(
-          collection: "users", 
-          doc: nw, 
+      context.read<DocumentProvider>().insertRecord(
+          collection: "users",
+          doc: nw,
           onError: (error) {
             print(error);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Paso algo con tu registro."))
-            );
+                const SnackBar(content: Text("Paso algo con tu registro.")));
           },
-          onSuccess: () => Navigator.of(context).push(createRoute(const Load()))
-          );
+          onSuccess: () =>
+              Navigator.of(context).push(createRoute(const Load())));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Algo mal validado"))
-            );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Algo mal validado")));
     }
   }
 
@@ -175,67 +155,63 @@ class _RegisterState extends State<Register>
         child: Form(
           key: _form,
           child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: const Text(
-                "Crear una cuenta nueva",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontFamily: "Poppins",
-                  fontSize: 40,
-                ),
-              ),
-            ),
-            Container(
-              child: GestureDetector(
-                onTap: (){
-                  Navigator.of(context).push(createRoute(const Login()));
-                },
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
                 child: const Text(
-                  "¿Ya estás registrado? Inicia sesión aquí.",
+                  "Crear una cuenta nueva",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: "DMSans",
-                    fontSize: 14,
-                    color: Colors.black
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Poppins",
+                    fontSize: 40,
                   ),
                 ),
               ),
-            ),
-            createField(_nameController, "Nombre"),
-            createField(_emailController, "Correo"),
-            createField(_pswController, "Contraseña"),
-            createField(_dateController, "Fecha de nacimiento"),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-              child: SizedBox(
-                width: 400,
-                height: 60,
-                child: TextButton(
-                onPressed: _onRegister,
-                
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xff88a3f4),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.zero)
-                  )
-                ),
-                child: const Text(
-                  "Crea tu cuenta",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontFamily: "DMSans",
-                    fontWeight: FontWeight.bold
+              Container(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(createRoute(const Login()));
+                  },
+                  child: const Text(
+                    "¿Ya estás registrado? Inicia sesión aquí.",
+                    style: TextStyle(
+                        fontFamily: "DMSans",
+                        fontSize: 14,
+                        color: Colors.black),
                   ),
                 ),
               ),
-              ),
-            )
-          ],
-        ),
+              createField(_nameController, "Nombre"),
+              createField(_emailController, "Correo"),
+              createField(_pswController, "Contraseña"),
+              createField(_dateController, "Fecha de nacimiento"),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                child: SizedBox(
+                  width: 400,
+                  height: 60,
+                  child: TextButton(
+                    onPressed: _onRegister,
+                    style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xff88a3f4),
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.zero))),
+                    child: const Text(
+                      "Crea tu cuenta",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontFamily: "DMSans",
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

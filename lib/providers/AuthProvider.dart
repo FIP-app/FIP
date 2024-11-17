@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthProvider extends ChangeNotifier {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   FirebaseAuth get auth => _auth;
@@ -11,7 +10,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       var user = _auth.currentUser;
       return user != null;
-    } catch(e) {
+    } catch (e) {
       return false;
     }
   }
@@ -25,13 +24,13 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<String> register(String email, String password) async  {
+  Future<String> register(String email, String password) async {
     try {
-      final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      final credential = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
       return credential.user!.uid;
     } on FirebaseAuthException catch (e) {
       return e.code;
     }
   }
-
 }
