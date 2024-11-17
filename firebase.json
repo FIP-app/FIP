@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"fip-parking","appId":"1:64659852344:android:eec9989a7228a1ff7a2acd","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"fip-parking","configurations":{"android":"1:64659852344:android:eec9989a7228a1ff7a2acd","ios":"1:64659852344:ios:1b46c647e36b26027a2acd"}}}}}}
